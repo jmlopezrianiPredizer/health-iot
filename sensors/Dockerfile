@@ -8,4 +8,4 @@ COPY . /app
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD ["python", "rest_sensor.py"]
+CMD ["python", "sensor_rest.py"]

@@ -25,9 +25,9 @@ services:
       - mqtt
     networks:
       - iot-net
-    environment:
-      - MQTT_HOST=mqtt-broker
-      - MQTT_PORT=1883
+    # environment:
+    #   - MQTT_HOST=mqtt-broker
+    #   - MQTT_PORT=1883
 
 
   # 3) MQTT broker
@@ -52,14 +52,7 @@ services:
       - db
     networks:
       - iot-net
-    environment:
-      - MQTT_HOST=mqtt-broker
-      - MQTT_PORT=1883
-      - DB_HOST=postgres-db
-      - DB_PORT=5432
-      - DB_USER=iotuser
-      - DB_PASSWORD=iotpassword
-      - DB_NAME=healthdata
+    command: sh -c "sleep 5 && python subs.py"
 
   # 5) Postgres
   db:

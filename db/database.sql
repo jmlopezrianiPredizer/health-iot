@@ -6,6 +6,6 @@ CREATE TABLE readings(
     sensor_id TEXT NOT NULL,
     heart_rate INTEGER NOT NULL,
     temperature NUMBER NOT NULL,
-    blood_pressure TEXT NOT NULL,
+    pressure TEXT NOT NULL,
     record_time TIMESTAMP NOT NULL DEFAULT now()
 );

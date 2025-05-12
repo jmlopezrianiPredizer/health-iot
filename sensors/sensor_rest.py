@@ -8,7 +8,7 @@ def generate_data():
         "id": ids,
         "heart_rate": random.randint(50, 160),
         "temperature": round(random.uniform(36.0, 40.0), 1),
-        "blood_pressure": f"{random.randint(110, 130)}/{random.randint(70, 85)}"
+        "pressure": f"{random.randint(110, 130)}/{random.randint(70, 85)}"
     }
 
 def run():

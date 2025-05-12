@@ -26,7 +26,7 @@ def rest_loop():
     """
     Cada 5 s hace GET al sensor REST y publica el JSON
     """
-    url = "http://sensors_rest:5000/data"
+    url = "http://sensor_rest:5000/data"
     while True:
         try:
             resp = requests.get(url, timeout=3)
@@ -44,7 +44,7 @@ async def ws_loop():
     """
     Se conecta al sensor WebSocket y publica cada mensaje que llega
     """
-    uri = "ws://sensors_ws:6789"
+    uri = "ws://sensor_ws:5002"
     while True:
         try:
             async with websockets.connect(uri) as ws:
@@ -65,7 +65,7 @@ def grpc_loop():
     y publica la respuesta (Response) en MQTT.
     """
     # 1) Canal al servicio gRPC
-    channel = grpc.insecure_channel("sensors_grpc:50051")
+    channel = grpc.insecure_channel("sensor_grpc:50051")
     # 2) Stub que genera protoc: IotServiceStub
     stub   = iot_pb2_grpc.IotServiceStub(channel)
 
