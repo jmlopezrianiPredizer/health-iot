@@ -15,7 +15,8 @@ def run():
     while True:
         iotData = generate_data()
         response = stub.SendData(iotData)
-        print(f"Sent: {iotData}" + f"Respuesta: {response.status}")
+        print(f"Sent: {iotData}")
+        print(f"Response: {response.status}")
         time.sleep(5)
 
 if __name__ == "__main__":
