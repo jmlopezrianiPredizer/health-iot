@@ -9,3 +9,7 @@ paho-mqtt
 
 # Cliente WebSocket
 websockets
+
+flask
+
+grpcio-tools
