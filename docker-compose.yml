@@ -1,0 +1,83 @@
+version: "3.8"
+
+services:
+  # 1) Sensors
+  sensors:
+    build: ./sensors
+    # we let Compose generate container names so you can scale
+    depends_on:
+      - gateway
+    networks:
+      - iot-net
+    environment:
+      # if empty, code will fall back to HOSTNAME
+      - SENSOR_ID=${SENSOR_ID:-}
+
+  # 2) Gateway: accepts WebSocket from sensors + publishes to MQTT
+  gateway:
+    build: ./gateway
+    container_name: gateway
+    ports:
+      - "5000:5000"       # REST endpoint
+      - "50051:50051"     # gRPC endpoint
+      - "5002:5002"       # WebSocket endpoint
+    depends_on:
+      - mqtt
+    networks:
+      - iot-net
+    environment:
+      - MQTT_HOST=mqtt-broker
+      - MQTT_PORT=1883
+
+
+  # 3) MQTT broker
+  mqtt:
+    image: eclipse-mosquitto:2.0
+    container_name: mqtt-broker
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./broker/persistence:/broker/persistence
+      - ./broker/logs:/broker/logs
+    networks:
+      - iot-net
+
+  # 4) Subscriber: reads from MQTT and writes to Postgres
+  subscriber:
+    build: ./subscriber
+    container_name: subscriber
+    depends_on:
+      - mqtt
+      - db
+    networks:
+      - iot-net
+    environment:
+      - MQTT_HOST=mqtt-broker
+      - MQTT_PORT=1883
+      - DB_HOST=postgres-db
+      - DB_PORT=5432
+      - DB_USER=iotuser
+      - DB_PASSWORD=iotpassword
+      - DB_NAME=healthdata
+
+  # 5) Postgres
+  db:
+    image: postgres:15
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: readings
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - iot-net
+
+networks:
+  iot-net:
+
+volumes:
+  pgdata:
