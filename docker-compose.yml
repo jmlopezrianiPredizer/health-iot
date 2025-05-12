@@ -9,9 +9,6 @@ services:
       - gateway
     networks:
       - iot-net
-    environment:
-      # if empty, code will fall back to HOSTNAME
-      - SENSOR_ID=${SENSOR_ID:-}
 
   # 2) Gateway: accepts WebSocket from sensors + publishes to MQTT
   gateway:

@@ -1,9 +1,9 @@
 import grpc, time, random, os, iot_pb2, iot_pb2_grpc
 
 def generate_data():
-    ids = os.getenv("SENSOR_ID", "SENSOR_GRPC")
+    # ids = os.getenv("SENSOR_ID", "SENSOR_GRPC")
     return iot_pb2.Data(
-        id=ids,
+        id="Sensor grpc",
         heart_rate = random.randint(50,160),
         temperature=round(random.uniform(36.0, 40.0), 1),
         pressure=f"{random.randint(110, 130)}/{random.randint(70, 85)}"

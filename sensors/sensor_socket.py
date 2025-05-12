@@ -4,9 +4,8 @@ import os, time, random, json, websocket
 GATEWAY_WS_URL = "ws://gateway:5002/ws"
 
 def generate_health_data():
-    ids = os.getenv("SENSOR_ID", "WS_SENSOR")
     return {
-        "id": ids,
+        "id": "Sensor socket",
         "heart_rate": random.randint(50, 160),
         "temperature": round(random.uniform(36.0, 40.0), 1),
         "pressure": f"{random.randint(110, 130)}/{random.randint(70, 85)}"

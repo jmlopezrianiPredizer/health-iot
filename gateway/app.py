@@ -16,7 +16,9 @@ MQTT_PORT = 1883
 MQTT_TOPIC = "iot/entries"
 
 mqtt_client = mqtt.Client()
+mqtt_client.loop_start()
 mqtt_ws_client = mqtt.Client()
+mqtt_ws_client.loop_start()
 
 class iotService(iot_pb2_grpc.IotServiceServicer):
     def SendData(self, request, context):
@@ -80,8 +82,8 @@ async def run_ws():
 
 if __name__ == "__main__":
     # arrancar REST, gRPC y WebSocket en procesos separados
-    Process(target=run_rest, daemon=True).start()
     Process(target=run_grpc, daemon=True).start()
+    Process(target=run_rest, daemon=True).start()
     Process(target=lambda: asyncio.run(run_ws()), daemon=True).start()
 
     while True:
