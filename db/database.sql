@@ -5,7 +5,7 @@ CREATE TABLE readings(
     reading_id SERIAL PRIMARY KEY,
     sensor_id TEXT NOT NULL,
     heart_rate INTEGER NOT NULL,
-    temperature NUMBER NOT NULL,
+    temperature REAL NOT NULL,
     pressure TEXT NOT NULL,
     record_time TIMESTAMP NOT NULL DEFAULT now()
 );

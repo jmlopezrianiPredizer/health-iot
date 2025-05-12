@@ -25,10 +25,6 @@ services:
       - mqtt
     networks:
       - iot-net
-    # environment:
-    #   - MQTT_HOST=mqtt-broker
-    #   - MQTT_PORT=1883
-
 
   # 3) MQTT broker
   mqtt:
@@ -48,11 +44,14 @@ services:
     build: ./subscriber
     container_name: subscriber
     depends_on:
-      - mqtt
-      - db
+      db:
+        condition: service_healthy
+      mqtt:
+        condition: service_started
     networks:
       - iot-net
-    command: sh -c "sleep 5 && python subs.py"
+    command: python sub.py
+    restart: on-failure
 
   # 5) Postgres
   db:
@@ -61,13 +60,18 @@ services:
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: 12345
-      POSTGRES_DB: readings
+      POSTGRES_DB: iotdata
     ports:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     networks:
       - iot-net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d iotdata"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 networks:
   iot-net:

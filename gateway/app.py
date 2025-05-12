@@ -1,109 +1,88 @@
-import threading
-import time
-import json
+from multiprocessing import Process
 import asyncio
-import requests
-import websockets
+from concurrent import futures
 import grpc
+import json
+import iot_pb2
+import iot_pb2_grpc
 import paho.mqtt.client as mqtt
-
-# Estos dos archivos deben estar en el mismo directorio:
-#  - iot_pb2.py
-#  - iot_pb2_grpc.py
-import iot_pb2, iot_pb2_grpc
-
-# ---------- Configuración MQTT ----------
-MQTT_BROKER = "mosquitto"      # nombre del servicio en docker-compose
-MQTT_PORT   = 1883
-MQTT_TOPIC  = "health/data"
-
-mqttc = mqtt.Client()
-mqttc.connect(MQTT_BROKER, MQTT_PORT)
+from flask import Flask, request
+import time
+from websockets import serve
 
 
-# ---------- Loop REST ----------
-def rest_loop():
-    """
-    Cada 5 s hace GET al sensor REST y publica el JSON
-    """
-    url = "http://sensor_rest:5000/data"
-    while True:
-        try:
-            resp = requests.get(url, timeout=3)
-            resp.raise_for_status()
-            data = resp.json()
-            mqttc.publish(MQTT_TOPIC, json.dumps(data))
-            print("[REST] Publicado:", data)
-        except Exception as e:
-            print("[REST] Error:", e)
-        time.sleep(5)
+MQTT_BROKER = "mqtt"
+MQTT_PORT = 1883
+MQTT_TOPIC = "iot/entries"
 
+mqtt_client = mqtt.Client()
+mqtt_ws_client = mqtt.Client()
 
-# ---------- Loop WebSocket ----------
-async def ws_loop():
-    """
-    Se conecta al sensor WebSocket y publica cada mensaje que llega
-    """
-    uri = "ws://sensor_ws:5002"
-    while True:
-        try:
-            async with websockets.connect(uri) as ws:
-                print("[WS] Conectado a", uri)
-                async for message in ws:
-                    mqttc.publish(MQTT_TOPIC, message)
-                    print("[WS] Publicado:", message)
-        except Exception as e:
-            print("[WS] Error:", e)
-            # si se desconecta, reintentar en 5 s
-            await asyncio.sleep(5)
+class iotService(iot_pb2_grpc.IotServiceServicer):
+    def SendData(self, request, context):
+        data = {
+            "sensor_id":     request.id,
+            "heart_rate":    request.heart_rate,
+            "temperature":   request.temperature,
+            "pressure": request.pressure
+        }
+        print("grpc", data)
+        mqtt_client.publish(MQTT_TOPIC, json.dumps(data))
+        return iot_pb2.Response(status="OK")
 
+def run_grpc():
+    mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
+    servicer = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
+    iot_pb2_grpc.add_IotServiceServicer_to_server(iotService(), servicer)
+    servicer.add_insecure_port('[::]:50051')
+    print("Servidor gRPC iniciado en el puerto 50051")
+    servicer.start()
+    servicer.wait_for_termination()
 
-# ---------- Loop gRPC ----------
-def grpc_loop():
-    """
-    Crea un canal al servidor gRPC y, cada 5 s, envía un Data
-    y publica la respuesta (Response) en MQTT.
-    """
-    # 1) Canal al servicio gRPC
-    channel = grpc.insecure_channel("sensor_grpc:50051")
-    # 2) Stub que genera protoc: IotServiceStub
-    stub   = iot_pb2_grpc.IotServiceStub(channel)
+app = Flask(__name__)
+client_rest = mqtt.Client()
+client_rest.connect(MQTT_BROKER, MQTT_PORT, 60)
 
-    while True:
-        try:
-            # 3) Prepara tu mensaje Data según el proto
-            req = iot_pb2.Data(
-                id="sensor-1",
-                heart_rate=80,
-                temperature=36.5,
-                pressure="120/80"
-            )
-            # 4) Llamada remota SendData, que devuelve un Response
-            resp = stub.SendData(req)
+@app.route('/data', methods=['POST'])
+def receive_data():
+    body = request.json
+    data = {
+        "sensor_id":     body.get("id"),
+        "heart_rate":    body["heart_rate"],
+        "temperature":   body["temperature"],
+        "pressure":      body["pressure"]
+    }
+    print("Recibido:", data)
+    client_rest.publish(MQTT_TOPIC, json.dumps(data))
+    return '', 200
 
-            # 5) Publica el status y los valores en MQTT
-            payload = {
-                "id":           req.id,
-                "heart_rate":   req.heart_rate,
-                "temperature":  req.temperature,
-                "pressure":     req.pressure,
-                "status":       resp.status
-            }
-            mqttc.publish(MQTT_TOPIC, json.dumps(payload))
-            print("[gRPC] Publicado:", payload)
+def run_rest():
+    print("Servidor Rest iniciado en el puerto 5000")
+    app.run(host="0.0.0.0", port=5000)
 
-        except Exception as e:
-            print("[gRPC] Error:", e)
+async def ws_handler(websocket):
+    async for message in websocket:
+        payload = json.loads(message)
+        data = {
+            "sensor_id":     payload.get("id"),
+            "heart_rate":    payload["heart_rate"],
+            "temperature":   payload["temperature"],
+            "pressure": payload["pressure"]
+        }
+        print("Recibido:", data)
+        mqtt_ws_client.publish(MQTT_TOPIC, json.dumps(data))
 
-        # 6) Espera antes de la siguiente llamada
-        time.sleep(5)
+async def run_ws():
+    mqtt_ws_client.connect(MQTT_BROKER, MQTT_PORT, 60)
+    print("Servidor WebSocket iniciado en el puerto 5002")
+    async with serve(ws_handler, "0.0.0.0", 5002):
+        await asyncio.Future()  # mantiene vivo el servidor
 
-
-# ---------- Arranque de hilos y corutina principal ----------
 if __name__ == "__main__":
-    # 1) REST en hilo aparte
-    threading.Thread(target=rest_loop, daemon=True).start()
-    # 2) gRPC en hilo aparte
-    threading.Thread(target=grpc_loop, daemon=True).start()
-    # 3) WebSocket en el hilo principal (asyncio)
-    asyncio.run(ws_loop())
+    # arrancar REST, gRPC y WebSocket en procesos separados
+    Process(target=run_rest, daemon=True).start()
+    Process(target=run_grpc, daemon=True).start()
+    Process(target=lambda: asyncio.run(run_ws()), daemon=True).start()
+
+    while True:
+        time.sleep(60)
