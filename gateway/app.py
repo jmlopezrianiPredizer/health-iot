@@ -63,12 +63,7 @@ def run_rest():
     print("Servidor Rest iniciado en el puerto 5000")
     app.run(host="0.0.0.0", port=5000)
 
-async def ws_handler(websocket, path):
-    # Sólo aceptamos conexiones a /ws
-    if path != "/ws":
-        await websocket.close(code=1008, reason="Path no soportado")
-        return
-
+async def ws_handler(websocket):
     async for message in websocket:
         payload = json.loads(message)
         data = {
@@ -83,7 +78,6 @@ async def ws_handler(websocket, path):
 async def run_ws():
     mqtt_ws_client.connect(MQTT_BROKER, MQTT_PORT, 60)
     mqtt_ws_client.loop_start()
-    print("Servidor WebSocket iniciado en el puerto 5002")
     async with serve(ws_handler, "0.0.0.0", 5002):
         await asyncio.Future()  # mantiene vivo el servidor
 

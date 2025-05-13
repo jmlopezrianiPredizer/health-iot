@@ -19,10 +19,27 @@ def send_data(ws):
         print(f"Enviado: {rsp}")
         time.sleep(5)
 
+# if __name__ == "__main__":
+#     socket = websocket.WebSocket()
+#     try:
+#         socket.connect(GATEWAY_WS_URL)
+#         send_data(socket)
+#     except Exception as e:
+#         print("Error de conexión:", e)
 if __name__ == "__main__":
-    socket = websocket.WebSocket()
-    try:
-        socket.connect(GATEWAY_WS_URL)
-        send_data(socket)
-    except Exception as e:
-        print("Error de conexión:", e)
+    while True:
+        ws = websocket.WebSocket()
+        try:
+            print(f"Conectando a {GATEWAY_WS_URL}…")
+            ws.connect(GATEWAY_WS_URL)
+            print("¡Conectado! Empezando a enviar datos…")
+            send_data(ws)
+        except Exception as e:
+            print("Error de conexión o envío:", e)
+        finally:
+            try:
+                ws.close()
+            except:
+                pass
+            print("Esperando 2s antes de reconectar…")
+            time.sleep(2)
