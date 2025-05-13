@@ -1,5 +1,6 @@
 
 import os, time, random, json, websocket
+from websocket import WebSocketApp
 
 GATEWAY_WS_URL = "ws://gateway:5002/ws"
 
@@ -19,27 +20,33 @@ def send_data(ws):
         print(f"Enviado: {rsp}")
         time.sleep(5)
 
-# if __name__ == "__main__":
-#     socket = websocket.WebSocket()
-#     try:
-#         socket.connect(GATEWAY_WS_URL)
-#         send_data(socket)
-#     except Exception as e:
-#         print("Error de conexión:", e)
+
 if __name__ == "__main__":
-    while True:
-        ws = websocket.WebSocket()
-        try:
-            print(f"Conectando a {GATEWAY_WS_URL}…")
-            ws.connect(GATEWAY_WS_URL)
-            print("¡Conectado! Empezando a enviar datos…")
-            send_data(ws)
-        except Exception as e:
-            print("Error de conexión o envío:", e)
-        finally:
-            try:
-                ws.close()
-            except:
-                pass
-            print("Esperando 2s antes de reconectar…")
-            time.sleep(2)
+    # while True:
+    #     ws = websocket.WebSocket()
+    #     try:
+    #         print(f"Conectando a {GATEWAY_WS_URL}…")
+    #         ws.connect(GATEWAY_WS_URL)
+    #         print("¡Conectado! Empezando a enviar datos…")
+    #         send_data(ws)
+    #     except Exception as e:
+    #         print("Error de conexión o envío:", e)
+    #     finally:
+    #         try:
+    #             ws.close()
+    #         except:
+    #             pass
+    #         print("Esperando 2s antes de reconectar…")
+    #         time.sleep(2)
+    ws_app = WebSocketApp(
+        GATEWAY_WS_URL,
+        on_open=on_open,
+        on_error=on_error,
+        on_close=on_close,
+    )
+    # Aquí es donde pones run_forever:
+    ws_app.run_forever(
+        ping_interval=20,   # envía un ping cada 20s
+        ping_timeout=10,    # espera hasta 10s por el pong
+        reconnect=5         # reintenta cada 5s si se desconecta
+    )
