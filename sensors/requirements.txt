@@ -1,5 +1,4 @@
 requests
 websocket-client
-websocket-WebSocketApp
 grpcio
 grpcio-tools
