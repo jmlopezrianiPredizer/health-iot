@@ -74,12 +74,19 @@ async def ws_handler(websocket):
         }
         print("Recibido WS:", data)
         mqtt_ws_client.publish(MQTT_TOPIC, json.dumps(data))
-
+        
 async def run_ws():
     mqtt_ws_client.connect(MQTT_BROKER, MQTT_PORT, 60)
     mqtt_ws_client.loop_start()
-    async with serve(ws_handler, "0.0.0.0", 5002):
-        await asyncio.Future()  # mantiene vivo el servidor
+    print("Servidor WebSocket iniciado en el puerto 5002")
+    async with serve(
+        ws_handler,              # tu handler ya definido
+        "0.0.0.0",               # escucha en todas las interfaces
+        5002,                    # puerto del WebSocket
+        ping_interval=None       # desactiva los pings automáticos
+    ):
+        await asyncio.Future()   # mantiene el servidor vivo indefinidamente
+
 
 if __name__ == "__main__":
     # arrancar REST, gRPC y WebSocket en procesos separados
