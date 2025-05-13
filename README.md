@@ -54,7 +54,7 @@ Recibe datos desde los sensores a través de múltiples protocolos y los publica
 
 - Imagen: `eclipse-mosquitto:2.0`
 - Puerto: `1883`
-- Guarda logs y mensajes en volúmenes persistentes.
+- Guarda logs y mensajes.
 
 ### 🔹 Subscriber
 
@@ -71,7 +71,53 @@ Lee mensajes del broker MQTT y los guarda en una base de datos PostgreSQL.
 
 ## 🚀 Cómo ejecutar el proyecto
 
-1. **Construye los servicios (sin usar cache):**
+1. **Construye los servicios:**
 
 ```bash
 docker-compose build --no-cache
+```
+2. **Ejecuta todos los servicios:**
+
+```bash
+docker-compose build --no-cache
+```
+3. **Detiene todo:**
+
+```bash
+docker-compose down
+```
+## 🔎 Algunos comandos extras
+
+**Verifica que el contenedor esté en ejecución:**
+
+```bash
+docker ps
+```
+**Útil si solo quieres inspeccionar la base de datos:**
+
+```bash
+docker-compose up -d db
+```
+
+## 🐘 Cómo acceder a la base de datos con DBeaver
+
+Puedes usar DBeaver para conectarte y visualizar la base de datos PostgreSQL que utiliza el sistema.
+
+### 🔧 Pasos para conectarse
+
+1. Abre **DBeaver**.
+2. Ve a **Database > New Database Connection**.
+3. Selecciona **PostgreSQL** y haz clic en **Next**.
+4. Llena los campos de conexión con la siguiente información:
+
+| Parámetro    | Valor         |
+|--------------|---------------|
+| **Host**     | `localhost`   |
+| **Port**     | `5432`        |
+| **Database** | `iotdata`     |
+| **Username** | `user`        |
+| **Password** | `12345`       |
+
+5. Haz clic en **Test Connection**.
+   - Si es la primera vez, DBeaver te pedirá descargar el controlador. Acepta.
+6. Si la prueba es exitosa, haz clic en **Finish**.
