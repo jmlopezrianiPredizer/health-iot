@@ -16,9 +16,9 @@ MQTT_PORT = 1883
 MQTT_TOPIC = "iot/entries"
 
 mqtt_client = mqtt.Client()
-mqtt_client.loop_start()
+
 mqtt_ws_client = mqtt.Client()
-mqtt_ws_client.loop_start()
+
 
 class iotService(iot_pb2_grpc.IotServiceServicer):
     def SendData(self, request, context):
@@ -34,6 +34,7 @@ class iotService(iot_pb2_grpc.IotServiceServicer):
 
 def run_grpc():
     mqtt_client.connect(MQTT_BROKER, MQTT_PORT, 60)
+    mqtt_client.loop_start()
     servicer = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     iot_pb2_grpc.add_IotServiceServicer_to_server(iotService(), servicer)
     servicer.add_insecure_port('[::]:50051')
@@ -62,20 +63,26 @@ def run_rest():
     print("Servidor Rest iniciado en el puerto 5000")
     app.run(host="0.0.0.0", port=5000)
 
-async def ws_handler(websocket):
+async def ws_handler(websocket, path):
+    # Sólo aceptamos conexiones a /ws
+    if path != "/ws":
+        await websocket.close(code=1008, reason="Path no soportado")
+        return
+
     async for message in websocket:
         payload = json.loads(message)
         data = {
-            "sensor_id":     payload.get("id"),
-            "heart_rate":    payload["heart_rate"],
-            "temperature":   payload["temperature"],
-            "pressure": payload["pressure"]
+            "sensor_id":   payload.get("id"),
+            "heart_rate":  payload["heart_rate"],
+            "temperature": payload["temperature"],
+            "pressure":    payload["pressure"]
         }
-        print("Recibido:", data)
+        print("Recibido WS:", data)
         mqtt_ws_client.publish(MQTT_TOPIC, json.dumps(data))
 
 async def run_ws():
     mqtt_ws_client.connect(MQTT_BROKER, MQTT_PORT, 60)
+    mqtt_ws_client.loop_start()
     print("Servidor WebSocket iniciado en el puerto 5002")
     async with serve(ws_handler, "0.0.0.0", 5002):
         await asyncio.Future()  # mantiene vivo el servidor

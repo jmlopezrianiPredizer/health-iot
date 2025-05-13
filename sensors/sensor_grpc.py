@@ -10,7 +10,7 @@ def generate_data():
     )
 
 def run():
-    channel = grpc.insecure_channel('gateway:50051')
+    channel = grpc.insecure_channel('dns:///gateway:50051')
     stub = iot_pb2_grpc.IotServiceStub(channel)
     while True:
         iotData = generate_data()

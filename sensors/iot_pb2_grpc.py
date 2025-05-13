@@ -35,7 +35,7 @@ class IotServiceStub(object):
             channel: A grpc.Channel.
         """
         self.SendData = channel.unary_unary(
-                '/IotService/SendData',
+                '/sensor.IotService/SendData',
                 request_serializer=iot__pb2.Data.SerializeToString,
                 response_deserializer=iot__pb2.Response.FromString,
                 _registered_method=True)
@@ -60,9 +60,9 @@ def add_IotServiceServicer_to_server(servicer, server):
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'IotService', rpc_method_handlers)
+            'sensor.IotService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('IotService', rpc_method_handlers)
+    server.add_registered_method_handlers('sensor.IotService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
@@ -83,7 +83,7 @@ class IotService(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/IotService/SendData',
+            '/sensor.IotService/SendData',
             iot__pb2.Data.SerializeToString,
             iot__pb2.Response.FromString,
             options,

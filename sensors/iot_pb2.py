@@ -24,17 +24,17 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\tiot.proto\"M\n\x04\x44\x61ta\x12\n\n\x02id\x18\x01 \x01(\t\x12\x12\n\nheart_rate\x18\x02 \x01(\x05\x12\x13\n\x0btemperature\x18\x03 \x01(\x02\x12\x10\n\x08pressure\x18\x04 \x01(\t\"\x1a\n\x08Response\x12\x0e\n\x06status\x18\x01 \x01(\t2*\n\nIotService\x12\x1c\n\x08SendData\x12\x05.Data\x1a\t.Responseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\tiot.proto\x12\x06sensor\"M\n\x04\x44\x61ta\x12\n\n\x02id\x18\x01 \x01(\t\x12\x12\n\nheart_rate\x18\x02 \x01(\x05\x12\x13\n\x0btemperature\x18\x03 \x01(\x02\x12\x10\n\x08pressure\x18\x04 \x01(\t\"\x1a\n\x08Response\x12\x0e\n\x06status\x18\x01 \x01(\t28\n\nIotService\x12*\n\x08SendData\x12\x0c.sensor.Data\x1a\x10.sensor.Responseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'iot_pb2', _globals)
 if not _descriptor._USE_C_DESCRIPTORS:
   DESCRIPTOR._loaded_options = None
-  _globals['_DATA']._serialized_start=13
-  _globals['_DATA']._serialized_end=90
-  _globals['_RESPONSE']._serialized_start=92
-  _globals['_RESPONSE']._serialized_end=118
-  _globals['_IOTSERVICE']._serialized_start=120
-  _globals['_IOTSERVICE']._serialized_end=162
+  _globals['_DATA']._serialized_start=21
+  _globals['_DATA']._serialized_end=98
+  _globals['_RESPONSE']._serialized_start=100
+  _globals['_RESPONSE']._serialized_end=126
+  _globals['_IOTSERVICE']._serialized_start=128
+  _globals['_IOTSERVICE']._serialized_end=184
 # @@protoc_insertion_point(module_scope)

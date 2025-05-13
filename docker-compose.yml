@@ -1,14 +1,25 @@
 version: "3.8"
 
 services:
-  # 1) Sensors
-  sensors:
+  sensor-rest:
     build: ./sensors
-    # we let Compose generate container names so you can scale
-    depends_on:
-      - gateway
+    command: python sensor_rest.py
+    depends_on: [gateway]
     networks:
       - iot-net
+  sensor-grpc:
+    build: ./sensors
+    command: python sensor_grpc.py
+    depends_on: [gateway]
+    networks:
+      - iot-net
+  sensor-socket:
+    build: ./sensors
+    command: python sensor_socket.py
+    depends_on: [gateway]
+    networks:
+      - iot-net
+
 
   # 2) Gateway: accepts WebSocket from sensors + publishes to MQTT
   gateway:

@@ -38,8 +38,12 @@ def on_message(client, userdata, msg):
     )
     print("Exitoso registro:", payload)
 
+def on_subscribe(client, userdata, mid, granted_qos):
+    print(f"Subscribed! mid={mid}, qos={granted_qos}")
+
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
+client.on_subscribe = on_subscribe
 client.connect(MQTT_BROKER, MQTT_PORT, 60)
 client.loop_forever()
