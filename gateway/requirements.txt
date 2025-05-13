@@ -1,15 +1,6 @@
-# Cliente gRPC
 grpcio
-
-# Peticiones HTTP
 requests
-
-# Cliente MQTT
 paho-mqtt
-
-# Cliente WebSocket
 websockets
-
 flask
-
 grpcio-tools

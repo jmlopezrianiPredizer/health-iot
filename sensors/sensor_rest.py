@@ -3,7 +3,6 @@ import os, time, requests, random, json
 url = "http://gateway:5000/data"
 
 def generate_data():
-    # ids = os.getenv("SENSOR_ID", "SENSOR_REST")
     return {
         "id": "Sensor rest",
         "heart_rate": random.randint(50, 160),

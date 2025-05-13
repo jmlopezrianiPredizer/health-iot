@@ -80,7 +80,7 @@ async def run_ws():
     mqtt_ws_client.loop_start()
     print("Servidor WebSocket iniciado en el puerto 5002")
     async with serve(
-        ws_handler,              # tu handler ya definido
+        ws_handler,
         "0.0.0.0",               # escucha en todas las interfaces
         5002,                    # puerto del WebSocket
         ping_interval=None       # desactiva los pings automáticos
@@ -89,7 +89,6 @@ async def run_ws():
 
 
 if __name__ == "__main__":
-    # arrancar REST, gRPC y WebSocket en procesos separados
     Process(target=run_grpc, daemon=True).start()
     Process(target=run_rest, daemon=True).start()
     Process(target=lambda: asyncio.run(run_ws()), daemon=True).start()
