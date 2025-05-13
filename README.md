@@ -79,7 +79,7 @@ docker-compose build --no-cache
 2. **Ejecuta todos los servicios:**
 
 ```bash
-docker-compose build --no-cache
+docker-compose up
 ```
 3. **Detiene todo:**
 
