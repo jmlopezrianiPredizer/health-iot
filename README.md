@@ -98,7 +98,7 @@ docker ps
 ```bash
 docker-compose up -d db
 ```
-
+---
 ## 🐘 Cómo acceder a la base de datos con DBeaver
 
 Puedes usar DBeaver para conectarte y visualizar la base de datos PostgreSQL que utiliza el sistema.
