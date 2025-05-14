@@ -68,7 +68,20 @@ Lee mensajes del broker MQTT y los guarda en una base de datos PostgreSQL.
 - Puerto: `5432`
 
 ---
+## 🗃️ Esquema de la Base de Datos
 
+La tabla `readings` almacena los registros recibidos desde los sensores IoT. Esta es su estructura:
+
+| Campo         | Tipo de Dato | Descripción                                  |
+|---------------|--------------|----------------------------------------------|
+| `reading_id`  | SERIAL       | Identificador único, clave primaria          |
+| `sensor_id`   | TEXT         | Identificador del sensor que envió el dato   |
+| `heart_rate`  | INTEGER      | Ritmo cardíaco en bpm                        |
+| `temperature` | REAL         | Temperatura corporal en grados Celsius       |
+| `pressure`    | TEXT         | Presión arterial en formato `"120/80"`       |
+| `record_time` | TIMESTAMP    | Fecha y hora de registro (por defecto: now)  |
+
+---
 ## 🚀 Cómo ejecutar el proyecto
 
 1. **Construye los servicios:**
