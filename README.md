@@ -87,18 +87,28 @@ La tabla `readings` almacena los registros recibidos desde los sensores IoT. Est
 1. **Construye los servicios:**
 
 ```bash
-docker-compose build --no-cache
+docker-compose build --no-cache gateway
 ```
 2. **Ejecuta todos los servicios:**
 
 ```bash
 docker-compose up
 ```
-3. **Detiene todo:**
-
+## ⭕ Cómo parar el proyecto
+1. **Detiene todo:**
+ ```bash
+ cmd + c
+ ```
+ Repetir para forzar shutdown
+2. **Elimina contededores:**
 ```bash
 docker-compose down
 ```
+3. **Elimina volumenes:**
+``bash
+docker-compose down --volumes
+``
+Esto asegura que al volver a alzar el proyecto no van a haber conflictos al ser construido.
 ## 🔎 Algunos comandos extras
 
 **Verifica que el contenedor esté en ejecución:**
