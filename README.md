@@ -84,12 +84,12 @@ La tabla `readings` almacena los registros recibidos desde los sensores IoT. Est
 ---
 ## 🚀 Cómo ejecutar el proyecto
 
-1. **Construye los servicios:**
+1. **Construye el gateway:**
 
 ```bash
 docker-compose build --no-cache gateway
 ```
-2. **Ejecuta todos los servicios:**
+2. **Construye y ejecuta todos los servicios:**
 
 ```bash
 docker-compose up
